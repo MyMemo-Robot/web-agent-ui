@@ -141,7 +141,10 @@ export function TileLayout({ chatOpen }: TileLayoutProps) {
                       chatOpen ? 'border-input/50' : 'border-transparent'
                     )}
                   >
-                    <AgentFaceAnimation animation={currentAnimation} size={chatOpen ? 'md' : 'lg'} />
+                    <AgentFaceAnimation
+                      animation={currentAnimation}
+                      size={chatOpen ? 'md' : 'lg'}
+                    />
                   </MotionContainer>
 
                   {/* Agent Voice Visualizer */}
