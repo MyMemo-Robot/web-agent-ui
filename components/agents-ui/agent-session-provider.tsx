@@ -1,11 +1,12 @@
-import {
-  SessionProvider,
-  type UseSessionReturn,
-  RoomAudioRenderer,
-  type SessionProviderProps,
-  type RoomAudioRendererProps,
-} from '@livekit/components-react';
 import { Room } from 'livekit-client';
+import {
+  RoomAudioRenderer,
+  type RoomAudioRendererProps,
+  SessionProvider,
+  type SessionProviderProps,
+  type UseSessionReturn,
+} from '@livekit/components-react';
+import { FaceAnimationProvider } from '@/hooks/use-face-animation-context';
 
 /**
  * Props for the AgentSessionProvider component.
@@ -54,7 +55,7 @@ export function AgentSessionProvider({
 }: AgentSessionProviderProps) {
   return (
     <SessionProvider session={session}>
-      {children}
+      <FaceAnimationProvider>{children}</FaceAnimationProvider>
       <RoomAudioRenderer {...roomAudioRendererProps} />
     </SessionProvider>
   );

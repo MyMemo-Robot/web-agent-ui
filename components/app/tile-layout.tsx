@@ -9,6 +9,8 @@ import {
   useVoiceAssistant,
 } from '@livekit/components-react';
 import { AgentAudioVisualizerBar } from '@/components/agents-ui/agent-audio-visualizer-bar';
+import { AgentFaceAnimation } from '@/components/agents-ui/agent-face-animation';
+import { useFaceAnimation } from '@/hooks/use-face-animation-context';
 import { cn } from '@/lib/shadcn/utils';
 
 const MotionContainer = motion.create('div');
@@ -57,6 +59,14 @@ const classNames = {
   // layout: Column 2 / Row 2
   // align: x-end y-end
   secondTileChatClosed: ['col-start-2 row-start-3', 'place-content-end'],
+  // Face Animation
+  // layout: Column 1 / Row 3
+  // align: x-start y-end
+  faceAnimationChatOpen: ['col-start-1 row-start-3', 'self-end justify-self-start'],
+  // Face Animation
+  // chatOpen: false
+  // layout: absolute positioned bottom-left
+  faceAnimationChatClosed: ['col-start-1 row-start-3', 'self-end justify-self-start'],
 };
 
 export function useLocalTrackRef(source: Track.Source) {
@@ -81,6 +91,7 @@ export function TileLayout({ chatOpen }: TileLayoutProps) {
   } = useVoiceAssistant();
   const [screenShareTrack] = useTracks([Track.Source.ScreenShare]);
   const cameraTrack: TrackReference | undefined = useLocalTrackRef(Track.Source.Camera);
+  const { currentAnimation } = useFaceAnimation();
 
   const isCameraEnabled = cameraTrack && !cameraTrack.publication.isMuted;
   const isScreenShareEnabled = screenShareTrack && !screenShareTrack.publication.isMuted;
@@ -95,7 +106,7 @@ export function TileLayout({ chatOpen }: TileLayoutProps) {
     <div className="pointer-events-none fixed inset-x-0 top-8 bottom-32 z-50 md:top-12 md:bottom-40">
       <div className="relative mx-auto h-full max-w-2xl px-4 md:px-0">
         <div className={cn(classNames.grid)}>
-          {/* Agent */}
+          {/* Agent with Face Animation */}
           <div
             className={cn([
               'grid',
@@ -106,42 +117,70 @@ export function TileLayout({ chatOpen }: TileLayoutProps) {
           >
             <AnimatePresence mode="popLayout">
               {!isAvatar && (
-                // Audio Agent
-                <MotionContainer
-                  key="agent"
-                  layoutId="agent"
-                  initial={{
-                    opacity: 0,
-                    scale: 0,
-                  }}
-                  animate={{
-                    opacity: 1,
-                    scale: chatOpen ? 1 : 4,
-                  }}
-                  transition={{
-                    ...ANIMATION_TRANSITION,
-                    delay: animationDelay,
-                  }}
-                  className={cn(
-                    'bg-background aspect-square h-[90px] rounded-md border border-transparent transition-[border,drop-shadow]',
-                    chatOpen && 'border-input/50 drop-shadow-lg/10 delay-200'
-                  )}
-                >
-                  <AgentAudioVisualizerBar
-                    barCount={5}
-                    state={agentState}
-                    audioTrack={agentAudioTrack}
-                    className={cn('flex h-full items-center justify-center gap-1 px-4 py-2')}
+                // Audio Agent with Face Animation
+                <div className="flex items-center gap-2">
+                  {/* Face Animation - Always visible, left of Agent */}
+                  <MotionContainer
+                    key="face-animation"
+                    layout="position"
+                    layoutId="face-animation"
+                    initial={{
+                      opacity: 0,
+                      scale: 0,
+                    }}
+                    animate={{
+                      opacity: 1,
+                      scale: chatOpen ? 1 : 4,
+                    }}
+                    transition={{
+                      ...ANIMATION_TRANSITION,
+                      delay: animationDelay,
+                    }}
+                    className={cn(
+                      'bg-background rounded-md border drop-shadow-lg/10',
+                      chatOpen ? 'border-input/50' : 'border-transparent'
+                    )}
                   >
-                    <span
-                      className={cn([
-                        'bg-muted min-h-2.5 w-2.5 rounded-full',
-                        'origin-center transition-colors duration-250 ease-linear',
-                        'data-[lk-highlighted=true]:bg-foreground data-[lk-muted=true]:bg-muted',
-                      ])}
-                    />
-                  </AgentAudioVisualizerBar>
-                </MotionContainer>
+                    <AgentFaceAnimation animation={currentAnimation} size={chatOpen ? 'md' : 'lg'} />
+                  </MotionContainer>
+
+                  {/* Agent Voice Visualizer */}
+                  <MotionContainer
+                    key="agent"
+                    layoutId="agent"
+                    initial={{
+                      opacity: 0,
+                      scale: 0,
+                    }}
+                    animate={{
+                      opacity: 1,
+                      scale: chatOpen ? 1 : 4,
+                    }}
+                    transition={{
+                      ...ANIMATION_TRANSITION,
+                      delay: animationDelay,
+                    }}
+                    className={cn(
+                      'bg-background aspect-square h-[90px] rounded-md border border-transparent transition-[border,drop-shadow]',
+                      chatOpen && 'border-input/50 drop-shadow-lg/10 delay-200'
+                    )}
+                  >
+                    <AgentAudioVisualizerBar
+                      barCount={5}
+                      state={agentState}
+                      audioTrack={agentAudioTrack}
+                      className={cn('flex h-full items-center justify-center gap-1 px-4 py-2')}
+                    >
+                      <span
+                        className={cn([
+                          'bg-muted min-h-2.5 w-2.5 rounded-full',
+                          'origin-center transition-colors duration-250 ease-linear',
+                          'data-[lk-highlighted=true]:bg-foreground data-[lk-muted=true]:bg-muted',
+                        ])}
+                      />
+                    </AgentAudioVisualizerBar>
+                  </MotionContainer>
+                </div>
               )}
 
               {isAvatar && (

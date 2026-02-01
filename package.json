@@ -39,6 +39,7 @@
     "jose": "^6.0.12",
     "livekit-client": "^2.15.15",
     "livekit-server-sdk": "^2.13.2",
+    "lottie-react": "^2.4.1",
     "lucide-react": "^0.555.0",
     "media-chrome": "^4.17.2",
     "mime": "^4.0.7",
