@@ -1,4 +1,17 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { GearIcon } from '@phosphor-icons/react';
+import { CredentialsForm } from '@/components/app/credentials-form';
 import { Button } from '@/components/ui/button';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { useLiveKitCredentials } from '@/hooks/use-livekit-credentials';
 
 function WelcomeImage() {
   return (
@@ -28,6 +41,16 @@ export const WelcomeView = ({
   onStartCall,
   ref,
 }: React.ComponentProps<'div'> & WelcomeViewProps) => {
+  const { credentials, hasCredentials, saveCredentials, isLoading } = useLiveKitCredentials();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  // Auto-open dialog on first visit when no credentials are stored
+  useEffect(() => {
+    if (!isLoading && !hasCredentials) {
+      setIsDialogOpen(true);
+    }
+  }, [isLoading, hasCredentials]);
+
   return (
     <div ref={ref}>
       <section className="bg-background flex flex-col items-center justify-center text-center">
@@ -37,14 +60,51 @@ export const WelcomeView = ({
           Chat live with your voice AI agent
         </p>
 
-        <Button
-          size="lg"
-          onClick={onStartCall}
-          className="mt-6 w-64 rounded-full font-mono text-xs font-bold tracking-wider uppercase"
-        >
-          {startButtonText}
-        </Button>
+        <div className="mt-6 flex items-center gap-2">
+          <Button
+            size="lg"
+            onClick={onStartCall}
+            disabled={!hasCredentials}
+            className="w-56 rounded-full font-mono text-xs font-bold tracking-wider uppercase"
+          >
+            {startButtonText}
+          </Button>
+          <Button
+            size="lg"
+            variant="outline"
+            onClick={() => setIsDialogOpen(true)}
+            className="rounded-full"
+            aria-label="Settings"
+          >
+            <GearIcon className="size-5" />
+          </Button>
+        </div>
+
+        {!hasCredentials && !isLoading && (
+          <p className="text-muted-foreground mt-3 text-sm">
+            Configure your LiveKit credentials to get started
+          </p>
+        )}
       </section>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>LiveKit Credentials</DialogTitle>
+            <DialogDescription>
+              Enter your LiveKit credentials to connect to your voice AI agent.
+            </DialogDescription>
+          </DialogHeader>
+          <CredentialsForm
+            initialCredentials={credentials}
+            onSave={(creds) => {
+              saveCredentials(creds);
+              setIsDialogOpen(false);
+            }}
+            onCancel={() => setIsDialogOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
 
       <div className="fixed bottom-5 left-0 flex w-full items-center justify-center">
         <p className="text-muted-foreground max-w-prose pt-1 text-xs leading-5 font-normal text-pretty md:text-sm">

@@ -118,7 +118,7 @@ export function TileLayout({ chatOpen }: TileLayoutProps) {
             <AnimatePresence mode="popLayout">
               {!isAvatar && (
                 // Audio Agent with Face Animation
-                <div className="flex items-center gap-2">
+                <div className={cn('flex items-center', chatOpen ? 'gap-2' : 'gap-32')}>
                   {/* Face Animation - Always visible, left of Agent */}
                   <MotionContainer
                     key="face-animation"
@@ -131,6 +131,7 @@ export function TileLayout({ chatOpen }: TileLayoutProps) {
                     animate={{
                       opacity: 1,
                       scale: chatOpen ? 1 : 4,
+                      x: chatOpen ? 0 : -120,
                     }}
                     transition={{
                       ...ANIMATION_TRANSITION,
@@ -158,6 +159,7 @@ export function TileLayout({ chatOpen }: TileLayoutProps) {
                     animate={{
                       opacity: 1,
                       scale: chatOpen ? 1 : 4,
+                      x: chatOpen ? 0 : 120,
                     }}
                     transition={{
                       ...ANIMATION_TRANSITION,

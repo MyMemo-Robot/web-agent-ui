@@ -10,6 +10,7 @@ import { StartAudioButton } from '@/components/agents-ui/start-audio-button';
 import { RpcHandlers } from '@/components/app/rpc-handlers';
 import { ViewController } from '@/components/app/view-controller';
 import { Toaster } from '@/components/ui/sonner';
+import { useLiveKitCredentials } from '@/hooks/use-livekit-credentials';
 import { useAgentErrors } from '@/hooks/useAgentErrors';
 import { useDebugMode } from '@/hooks/useDebug';
 import { getSandboxTokenSource } from '@/lib/utils';
@@ -28,11 +29,34 @@ interface AppProps {
 }
 
 export function App({ appConfig }: AppProps) {
+  const { credentials, hasCredentials } = useLiveKitCredentials();
+
   const tokenSource = useMemo(() => {
-    return typeof process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT === 'string'
-      ? getSandboxTokenSource(appConfig)
-      : TokenSource.endpoint('/api/connection-details');
-  }, [appConfig]);
+    if (typeof process.env.NEXT_PUBLIC_CONN_DETAILS_ENDPOINT === 'string') {
+      return getSandboxTokenSource(appConfig);
+    }
+
+    // Custom token source that includes credentials from localStorage
+    return TokenSource.custom(async () => {
+      const roomConfig = appConfig.agentName
+        ? { agents: [{ agent_name: appConfig.agentName }] }
+        : undefined;
+
+      const res = await fetch('/api/connection-details', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          room_config: roomConfig,
+          credentials: hasCredentials ? credentials : undefined,
+        }),
+      });
+
+      if (!res.ok) {
+        throw new Error(await res.text());
+      }
+      return res.json();
+    });
+  }, [appConfig, credentials, hasCredentials]);
 
   const session = useSession(
     tokenSource,
