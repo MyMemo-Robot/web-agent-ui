@@ -117,6 +117,10 @@ export const WelcomeView = ({
           >
             Voice AI quickstart
           </a>
+          . View{' '}
+          <a href="/face-animations" className="underline">
+            face animations
+          </a>
           .
         </p>
       </div>
