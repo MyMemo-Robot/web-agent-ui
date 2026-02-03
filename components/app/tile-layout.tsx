@@ -138,7 +138,7 @@ export function TileLayout({ chatOpen }: TileLayoutProps) {
                       delay: animationDelay,
                     }}
                     className={cn(
-                      'bg-background rounded-md border drop-shadow-lg/10',
+                      'bg-black rounded-md border drop-shadow-lg/10',
                       chatOpen ? 'border-input/50' : 'border-transparent'
                     )}
                   >
