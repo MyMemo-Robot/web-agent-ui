@@ -39,6 +39,19 @@ export const FACE_ANIMATION_PATHS: Record<FaceAnimation, string> = {
   loving: '/animations/loving.json',
 };
 
+// Mapping of animation names to video file paths
+export const FACE_VIDEO_PATHS: Record<FaceAnimation, string> = {
+  neutral: '/animations/videos/neutral.mp4',
+  happy: '/animations/videos/happy.mp4',
+  sad: '/animations/videos/sad.mp4',
+  thinking: '/animations/videos/thinking.mp4',
+  surprised: '/animations/videos/surprised.mp4',
+  curious: '/animations/videos/curious.mp4',
+  excited: '/animations/videos/excited.mp4',
+  concerned: '/animations/videos/concerned.mp4',
+  loving: '/animations/videos/loving.mp4',
+};
+
 // All available face animations
 export const FACE_ANIMATIONS: FaceAnimation[] = [
   'neutral',

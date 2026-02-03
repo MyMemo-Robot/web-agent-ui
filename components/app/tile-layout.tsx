@@ -10,6 +10,7 @@ import {
 } from '@livekit/components-react';
 import { AgentAudioVisualizerBar } from '@/components/agents-ui/agent-audio-visualizer-bar';
 import { AgentFaceAnimation } from '@/components/agents-ui/agent-face-animation';
+import { AgentVideoAnimation } from '@/components/agents-ui/agent-video-animation';
 import { useFaceAnimation } from '@/hooks/use-face-animation-context';
 import { cn } from '@/lib/shadcn/utils';
 
@@ -118,8 +119,8 @@ export function TileLayout({ chatOpen }: TileLayoutProps) {
             <AnimatePresence mode="popLayout">
               {!isAvatar && (
                 // Audio Agent with Face Animation
-                <div className={cn('flex items-center', chatOpen ? 'gap-2' : 'gap-32')}>
-                  {/* Face Animation - Always visible, left of Agent */}
+                <div className={cn('flex items-center', chatOpen ? 'gap-2' : 'gap-[400px]')}>
+                  {/* Face Animation (Lottie) - left of Agent */}
                   <MotionContainer
                     key="face-animation"
                     layout="position"
@@ -131,7 +132,6 @@ export function TileLayout({ chatOpen }: TileLayoutProps) {
                     animate={{
                       opacity: 1,
                       scale: chatOpen ? 1 : 4,
-                      x: chatOpen ? 0 : -120,
                     }}
                     transition={{
                       ...ANIMATION_TRANSITION,
@@ -148,6 +148,34 @@ export function TileLayout({ chatOpen }: TileLayoutProps) {
                     />
                   </MotionContainer>
 
+                  {/* Video Animation - side by side with Lottie */}
+                  <MotionContainer
+                    key="video-animation"
+                    layout="position"
+                    layoutId="video-animation"
+                    initial={{
+                      opacity: 0,
+                      scale: 0,
+                    }}
+                    animate={{
+                      opacity: 1,
+                      scale: chatOpen ? 1 : 4,
+                    }}
+                    transition={{
+                      ...ANIMATION_TRANSITION,
+                      delay: animationDelay,
+                    }}
+                    className={cn(
+                      'bg-background rounded-md border drop-shadow-lg/10',
+                      chatOpen ? 'border-input/50' : 'border-transparent'
+                    )}
+                  >
+                    <AgentVideoAnimation
+                      animation={currentAnimation}
+                      size={chatOpen ? 'md' : 'lg'}
+                    />
+                  </MotionContainer>
+
                   {/* Agent Voice Visualizer */}
                   <MotionContainer
                     key="agent"
@@ -159,7 +187,6 @@ export function TileLayout({ chatOpen }: TileLayoutProps) {
                     animate={{
                       opacity: 1,
                       scale: chatOpen ? 1 : 4,
-                      x: chatOpen ? 0 : 120,
                     }}
                     transition={{
                       ...ANIMATION_TRANSITION,
